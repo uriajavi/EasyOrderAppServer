@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Entity JPA class for employee data.
@@ -20,6 +21,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "empleado", schema = "easyorderappdb")
+@XmlRootElement
 public class Empleado implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -75,7 +77,7 @@ public class Empleado implements Serializable {
 	/**
 	 * Shifts of the employee.
 	 */
-	@ManyToMany(mappedBy = "pedido")
+	@ManyToMany(mappedBy = "empleados")
 	private List<Pedido> pedidos;
 
 	/**

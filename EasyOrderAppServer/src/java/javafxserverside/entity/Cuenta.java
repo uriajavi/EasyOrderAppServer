@@ -10,6 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Entity JPA class for account data.
@@ -18,6 +19,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "cuenta", schema = "easyorderappdb")
+@XmlRootElement
 public class Cuenta implements Serializable {
 
 	private static final long serialVersionUID = 1L;
