@@ -11,8 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
@@ -22,10 +20,6 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "empleado", schema = "easyorderappdb")
-@NamedQueries({
-	@NamedQuery(name = "findUserByLogin",
-		query = "SELECT e FROM Empleado e WHERE e.login = :login")
-})
 public class Empleado implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -81,7 +75,7 @@ public class Empleado implements Serializable {
 	/**
 	 * Shifts of the employee.
 	 */
-	@ManyToMany(mappedBy = "id")
+	@ManyToMany(mappedBy = "pedido")
 	private List<Pedido> pedidos;
 
 	/**

@@ -45,7 +45,7 @@ public class Cuenta implements Serializable {
 	 */
 	private Double saldo;
 	/**
-	 * TODO Client owning the account.
+	 * Client owning the account.
 	 */
 	@OneToOne
 	@MapsId

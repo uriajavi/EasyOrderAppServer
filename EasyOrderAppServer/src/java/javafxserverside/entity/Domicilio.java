@@ -44,14 +44,80 @@ public class Domicilio implements Serializable {
 	/**
 	 * Clients with this residence.
 	 */
-	@ManyToOne
-	@JoinColumn(name = "id")
+	@OneToMany(mappedBy = "cliente")
 	private List<Cliente> clientes;
+
 	/**
-	 * Shifts with this residence.
+	 * Gets the id value of the residence.
+	 *
+	 * @return The id value.
 	 */
-	@OneToMany(mappedBy = "pedido")
-	private List<Pedido> pedidos;
+	public Integer getId() {
+		return id;
+	}
+
+	/**
+	 * Sets the id value of the residence.
+	 *
+	 * @param id The id value.
+	 */
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	/**
+	 * Gets the town value of the residence.
+	 *
+	 * @return The town value.
+	 */
+	public String getLocalidad() {
+		return localidad;
+	}
+
+	/**
+	 * Sets the town value of the residence.
+	 *
+	 * @param localidad The town value.
+	 */
+	public void setLocalidad(String localidad) {
+		this.localidad = localidad;
+	}
+
+	/**
+	 * Gets the CP value of the residence.
+	 *
+	 * @return The CP value.
+	 */
+	public String getCodigoPostal() {
+		return codigoPostal;
+	}
+
+	/**
+	 * Sets the CP value of the residence.
+	 *
+	 * @param codigoPostal The CP value.
+	 */
+	public void setCodigoPostal(String codigoPostal) {
+		this.codigoPostal = codigoPostal;
+	}
+
+	/**
+	 * Gets the address value of the residence.
+	 *
+	 * @return The address value.
+	 */
+	public String getDireccion() {
+		return direccion;
+	}
+
+	/**
+	 * Sets the address value of the residence.
+	 *
+	 * @param direccion The address value.
+	 */
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
+	}
 
 	/**
 	 * HashCode method implementation for the entity.
@@ -61,7 +127,7 @@ public class Domicilio implements Serializable {
 	@Override
 	public int hashCode() {
 		int hash = 0;
-		hash += (id != null ? id.hashCode() : 0);
+		hash += (getId() != null ? getId().hashCode() : 0);
 		return hash;
 	}
 
@@ -107,7 +173,6 @@ public class Domicilio implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return "Domicilio{" + "id=" + id + '}';
+		return "Domicilio{" + "id=" + getId() + '}';
 	}
-
 }

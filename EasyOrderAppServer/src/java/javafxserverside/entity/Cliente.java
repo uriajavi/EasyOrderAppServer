@@ -2,6 +2,7 @@ package javafxserverside.entity;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -10,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -77,7 +79,8 @@ public class Cliente implements Serializable {
 	/**
 	 * Residence of the client.
 	 */
-	@OneToMany(mappedBy = "cliente")
+	@ManyToOne
+	@JoinColumn(name = "id")
 	private Domicilio domicilio;
 	/**
 	 * Account of the client.
@@ -86,6 +89,11 @@ public class Cliente implements Serializable {
 	@MapsId
 	@JoinColumn(name = "id")
 	private Cuenta cuenta;
+	/**
+	 * Shifts of the client.
+	 */
+	@OneToMany(mappedBy = "pedido")
+	private List<Pedido> pedidos;
 
 	/**
 	 * Gets the id of the employee.
