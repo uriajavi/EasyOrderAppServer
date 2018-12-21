@@ -7,10 +7,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Entity JPA class for residence.
@@ -19,6 +18,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "domicilio", schema = "easyorderappdb")
+@XmlRootElement
 public class Domicilio implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -44,7 +44,7 @@ public class Domicilio implements Serializable {
 	/**
 	 * Clients with this residence.
 	 */
-	@OneToMany(mappedBy = "cliente")
+	@OneToMany(mappedBy = "domicilio")
 	private List<Cliente> clientes;
 
 	/**
