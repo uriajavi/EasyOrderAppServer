@@ -22,6 +22,14 @@ import javax.persistence.Table;
 @Table(name = "producto", schema = "easyorderappdb")
 public class Producto implements Serializable {
 
+	public List<Pedido> getPedidos() {
+		return pedidos;
+	}
+
+	public void setPedidos(List<Pedido> pedidos) {
+		this.pedidos = pedidos;
+	}
+
 	private static final long serialVersionUID = 1L;
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)

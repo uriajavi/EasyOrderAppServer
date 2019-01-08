@@ -8,13 +8,13 @@ package javafxserverside.entity;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -30,7 +30,7 @@ public class Pedido implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 
 	private String nombre;
@@ -42,11 +42,29 @@ public class Pedido implements Serializable {
 	@Enumerated(EnumType.ORDINAL)
 	private EstadoPedido estadoPedido;
 	@ManyToMany
-	@JoinTable(name="PEDIDO_EMPLEADO")
+	@JoinTable(name="pedido_empleado",
+		schema="easyorderappdb")
 	private List<Empleado> empleados;
 	@ManyToMany
-	@JoinTable(name="PEDIDO_PRODUCTO")
+	@JoinTable(name="pedido_producto",
+		schema="easyorderappdb")
 	private List<Producto> productos;
+
+	public List<Empleado> getEmpleados() {
+		return empleados;
+	}
+
+	public void setEmpleados(List<Empleado> empleados) {
+		this.empleados = empleados;
+	}
+
+	public List<Producto> getProductos() {
+		return productos;
+	}
+
+	public void setProductos(List<Producto> productos) {
+		this.productos = productos;
+	}
 
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
@@ -67,7 +85,6 @@ public class Pedido implements Serializable {
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
 	}
-
 
 	public void setEstadoPedido(EstadoPedido estadoPedido) {
 		this.estadoPedido = estadoPedido;
@@ -117,13 +134,18 @@ public class Pedido implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object object) {
-		// TODO: Warning - this method won't work in the case the id fields are not set
-		if (!(object instanceof Pedido)) {
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
 			return false;
 		}
-		Pedido other = (Pedido) object;
-		if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Pedido other = (Pedido) obj;
+		if (!Objects.equals(this.id, other.id)) {
 			return false;
 		}
 		return true;
@@ -133,5 +155,5 @@ public class Pedido implements Serializable {
 	public String toString() {
 		return "javafxserverside.entity.Pedido[ id=" + id + " ]";
 	}
-	
+
 }

@@ -10,12 +10,12 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Entity JPA class for the client data.
@@ -24,7 +24,6 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "cliente", schema = "easyorderappdb")
-@XmlRootElement
 public class Cliente implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -87,6 +86,7 @@ public class Cliente implements Serializable {
 	 */
 	@OneToOne
 	@MapsId
+	@JoinColumn(name="id")
 	private Cuenta cuenta;
 	/**
 	 * Shifts of the client.
