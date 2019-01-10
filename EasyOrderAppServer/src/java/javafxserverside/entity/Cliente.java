@@ -1,7 +1,7 @@
 package javafxserverside.entity;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.Entity;
@@ -10,12 +10,14 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Entity JPA class for the client data.
@@ -24,6 +26,11 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "cliente", schema = "easyorderappdb")
+@NamedQueries({
+	@NamedQuery(name = "findAllClients",
+		query = "SELECT c FROM Cliente c ORDER BY c.login DESC")
+})
+@XmlRootElement
 public class Cliente implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -63,15 +70,18 @@ public class Cliente implements Serializable {
 	/**
 	 * Last time the employee signed in.
 	 */
-	private Timestamp lastAccess;
+	@Temporal(javax.persistence.TemporalType.TIMESTAMP)
+	private Date lastAccess;
 	/**
 	 * Last time the employee changed password.
 	 */
-	private Timestamp lastPasswordChange;
+	@Temporal(javax.persistence.TemporalType.TIMESTAMP)
+	private Date lastPasswordChange;
 	/**
 	 * Birth date of the employee.
 	 */
-	private Timestamp fechaDeNacimiento;
+	@Temporal(javax.persistence.TemporalType.TIMESTAMP)
+	private Date fechaDeNacimiento;
 	/**
 	 * Phone number of the employee.
 	 */
@@ -85,8 +95,6 @@ public class Cliente implements Serializable {
 	 * Account of the client.
 	 */
 	@OneToOne
-	@MapsId
-	@JoinColumn(name="id")
 	private Cuenta cuenta;
 	/**
 	 * Shifts of the client.
@@ -225,7 +233,7 @@ public class Cliente implements Serializable {
 	 *
 	 * @return The last access value.
 	 */
-	public Timestamp getLastAccess() {
+	public Date getLastAccess() {
 		return lastAccess;
 	}
 
@@ -234,7 +242,7 @@ public class Cliente implements Serializable {
 	 *
 	 * @param lastAccess The last access value.
 	 */
-	public void setLastAccess(Timestamp lastAccess) {
+	public void setLastAccess(Date lastAccess) {
 		this.lastAccess = lastAccess;
 	}
 
@@ -243,7 +251,7 @@ public class Cliente implements Serializable {
 	 *
 	 * @return The last password change.
 	 */
-	public Timestamp getLastPasswordChange() {
+	public Date getLastPasswordChange() {
 		return lastPasswordChange;
 	}
 
@@ -252,7 +260,7 @@ public class Cliente implements Serializable {
 	 *
 	 * @param lastPasswordChange The last password change value.
 	 */
-	public void setLastPasswordChange(Timestamp lastPasswordChange) {
+	public void setLastPasswordChange(Date lastPasswordChange) {
 		this.lastPasswordChange = lastPasswordChange;
 	}
 
@@ -261,7 +269,7 @@ public class Cliente implements Serializable {
 	 *
 	 * @return The birth date value.
 	 */
-	public Timestamp getFechaDeNacimiento() {
+	public Date getFechaDeNacimiento() {
 		return fechaDeNacimiento;
 	}
 
@@ -270,7 +278,7 @@ public class Cliente implements Serializable {
 	 *
 	 * @param fechaDeNacimiento The birth date value.
 	 */
-	public void setFechaDeNacimiento(Timestamp fechaDeNacimiento) {
+	public void setFechaDeNacimiento(Date fechaDeNacimiento) {
 		this.fechaDeNacimiento = fechaDeNacimiento;
 	}
 

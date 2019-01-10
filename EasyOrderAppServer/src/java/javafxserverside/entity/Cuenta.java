@@ -49,9 +49,7 @@ public class Cuenta implements Serializable {
 	/**
 	 * Client owning the account.
 	 */
-	@OneToOne
-	@MapsId
-	@JoinColumn(name = "id")
+	@OneToOne(mappedBy="cuenta")
 	private Cliente cliente;
 
 	/**

@@ -13,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
@@ -20,15 +21,9 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "producto", schema = "easyorderappdb")
+@XmlRootElement
 public class Producto implements Serializable {
 
-	public List<Pedido> getPedidos() {
-		return pedidos;
-	}
-
-	public void setPedidos(List<Pedido> pedidos) {
-		this.pedidos = pedidos;
-	}
 
 	private static final long serialVersionUID = 1L;
 	@Id
@@ -40,6 +35,13 @@ public class Producto implements Serializable {
 	@ManyToMany(mappedBy="productos")
 	private List<Pedido> pedidos;
 
+	public List<Pedido> getPedidos() {
+		return pedidos;
+	}
+
+	public void setPedidos(List<Pedido> pedidos) {
+		this.pedidos = pedidos;
+	}
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
