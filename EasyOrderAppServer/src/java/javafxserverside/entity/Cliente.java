@@ -89,13 +89,15 @@ public class Cliente implements Serializable {
 	/**
 	 * Residence of the client.
 	 */
-	@ManyToOne
-	private Domicilio domicilio;
+	private String localidad;
+	private String codigoPostal;
+	private String direccion;
 	/**
 	 * Account of the client.
 	 */
-	@OneToOne
-	private Cuenta cuenta;
+	private String numeroCuenta;
+	private String codigoSeguridad;
+	private Double saldo;
 	/**
 	 * Shifts of the client.
 	 */
@@ -301,39 +303,111 @@ public class Cliente implements Serializable {
 	}
 
 	/**
-	 * Gets the residence value of the client.
+	 * Gets the town value of the residence.
 	 *
-	 * @return The residence value.
+	 * @return The town value.
 	 */
-	public Domicilio getDomicilio() {
-		return domicilio;
+	public String getLocalidad() {
+		return localidad;
 	}
 
 	/**
-	 * Sets the residence value of the client.
+	 * Sets the town value of the residence.
 	 *
-	 * @param domicilio The residence value.
+	 * @param localidad The town value.
 	 */
-	public void setDomicilio(Domicilio domicilio) {
-		this.domicilio = domicilio;
+	public void setLocalidad(String localidad) {
+		this.localidad = localidad;
 	}
 
 	/**
-	 * Gets the account value of the client.
+	 * Gets the CP value of the residence.
 	 *
-	 * @return The account value.
+	 * @return The CP value.
 	 */
-	public Cuenta getCuenta() {
-		return cuenta;
+	public String getCodigoPostal() {
+		return codigoPostal;
 	}
 
 	/**
-	 * Sets the account value of the client.
+	 * Sets the CP value of the residence.
 	 *
-	 * @param cuenta The account value.
+	 * @param codigoPostal The CP value.
 	 */
-	public void setCuenta(Cuenta cuenta) {
-		this.cuenta = cuenta;
+	public void setCodigoPostal(String codigoPostal) {
+		this.codigoPostal = codigoPostal;
+	}
+
+	/**
+	 * Gets the address value of the residence.
+	 *
+	 * @return The address value.
+	 */
+	public String getDireccion() {
+		return direccion;
+	}
+
+	/**
+	 * Sets the address value of the residence.
+	 *
+	 * @param direccion The address value.
+	 */
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
+	}
+
+	/**
+	 * Gets the account number of the account.
+	 *
+	 * @return The account number.
+	 */
+	public String getNumeroCuenta() {
+		return numeroCuenta;
+	}
+
+	/**
+	 * Sets the account number of the account.
+	 *
+	 * @param numeroCuenta The account number value.
+	 */
+	public void setNumeroCuenta(String numeroCuenta) {
+		this.numeroCuenta = numeroCuenta;
+	}
+
+	/**
+	 * Gets the security code of the account.
+	 *
+	 * @return The security code value.
+	 */
+	public String getCodigoSeguridad() {
+		return codigoSeguridad;
+	}
+
+	/**
+	 * Sets the security code of the account.
+	 *
+	 * @param codigoSeguridad The security code value.
+	 */
+	public void setCodigoSeguridad(String codigoSeguridad) {
+		this.codigoSeguridad = codigoSeguridad;
+	}
+
+	/**
+	 * Gets the balance of the account.
+	 *
+	 * @return The balance value.
+	 */
+	public Double getSaldo() {
+		return saldo;
+	}
+
+	/**
+	 * Sets the balance of the account.
+	 *
+	 * @param saldo The balance value.
+	 */
+	public void setSaldo(Double saldo) {
+		this.saldo = saldo;
 	}
 
 	/**
