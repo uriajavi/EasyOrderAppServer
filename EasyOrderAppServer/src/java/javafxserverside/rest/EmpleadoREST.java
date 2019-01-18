@@ -64,6 +64,23 @@ public class EmpleadoREST {
 		return empleado;
 	}
 
+	@GET
+	@Path("login/{login}/{password}")
+	@Produces({"application/xml"})
+	public Empleado iniciarSesion(@PathParam("login") String login, @PathParam("password") String password) {
+		Empleado empleado = null;
+
+		try {
+			LOGGER.log(Level.INFO, "EmpleadoRESTful service: find employee by login={0}", login);
+			empleado = ejb.iniciarSesion(login, password);
+			LOGGER.log(Level.INFO, "EmpleadoRESTful service: found employee by login={0}", login);
+		} catch (ReadException ex) {
+			LOGGER.log(Level.SEVERE, "EmpleadoRESTful service: Exception reading employee by login, {0}", ex.getMessage());
+			throw new InternalServerErrorException(ex);
+		}
+		return empleado;
+	}
+
 	/**
 	 * RESTful GET method for reading all {@link Empleado} objects through an
 	 * XML representation.
@@ -87,6 +104,7 @@ public class EmpleadoREST {
 		return empleados;
 	}
 
+
 	/**
 	 * RESTful POST method for creating {@link Empleado} objects from XML
 	 * representation.
@@ -97,6 +115,7 @@ public class EmpleadoREST {
 	@Consumes({"application/xml"})
 	public void create(Empleado empleado) {
 		try {
+			empleado.setId(null); // POST method doesn't allow id value
 			LOGGER.log(Level.INFO, "EmpleadoRESTful service: create {0}.", empleado);
 			ejb.createEmpleado(empleado);
 			LOGGER.log(Level.INFO, "EmpleadoRESTful service: created {0}.", empleado);

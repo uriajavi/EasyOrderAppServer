@@ -27,7 +27,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "empleado", schema = "easyorderappdb")
 @NamedQueries({
 	@NamedQuery(name="findAllEmployees",
-		query="SELECT e FROM Empleado e ORDER BY e.login DESC")
+		query="SELECT e FROM Empleado e ORDER BY e.login DESC"),
+	@NamedQuery(name="findEmployeeByLogin",
+		query="SELECT e FROM Empleado e WHERE e.login = :login ORDER BY e.login DESC"),
 })
 @XmlRootElement
 public class Empleado implements Serializable {

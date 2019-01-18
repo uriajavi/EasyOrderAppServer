@@ -8,6 +8,8 @@ import javafxserverside.exception.ReadException;
 import javafxserverside.exception.UpdateException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static javafxserverside.utils.Crypto.decryptPassword;
+import static javafxserverside.utils.Crypto.digestPassword;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -53,6 +55,31 @@ public class EmpleadoManagerEJB implements EmpleadoManagerEJBLocal {
 		return empleado;
 	}
 
+	@Override
+	public Empleado iniciarSesion(String login, String password) throws ReadException {
+		Empleado empleado = null;
+
+		try {
+			LOGGER.info("EmpleadoManagerEJB: Finding employee by login.");
+			password = digestPassword(decryptPassword(password));
+
+			empleado = (Empleado) entityManager.createNamedQuery("findEmployeeByLogin").setParameter("login", login).getSingleResult();
+			if (empleado != null) {
+				LOGGER.log(Level.INFO, "EmpleadoManagerEJB: Employee found {0}", empleado.getLogin());
+				// compare passwords
+				if (!password.equals(empleado.getPassword())) {
+					LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception wrong password.");
+					throw new ReadException("Wrong password");
+				}
+			}
+		} catch (Exception ex) {
+			LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception Finding employee by login:", ex.getMessage());
+			throw new ReadException(ex.getMessage());
+		}
+
+		return empleado;
+	}
+
 	/**
 	 * Finds a List of {@link Empleado} objects containing data for all
 	 * employees in the application data storage.
@@ -84,6 +111,7 @@ public class EmpleadoManagerEJB implements EmpleadoManagerEJBLocal {
 	public void createEmpleado(Empleado empleado) throws CreateException {
 		LOGGER.info("EmpleadoManagerEJB: Creating employee.");
 		try {
+			empleado.setPassword(digestPassword(decryptPassword(empleado.getPassword())));
 			entityManager.persist(empleado);
 			LOGGER.info("EmpleadoManagerEJB: Employee created.");
 		} catch (Exception ex) {
