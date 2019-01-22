@@ -1,5 +1,6 @@
 package javafxserverside.ejb;
 
+import java.util.Date;
 import java.util.List;
 import javafxserverside.entity.Empleado;
 import javafxserverside.exception.CreateException;
@@ -67,10 +68,17 @@ public class EmpleadoManagerEJB implements EmpleadoManagerEJBLocal {
 			if (empleado != null) {
 				LOGGER.log(Level.INFO, "EmpleadoManagerEJB: Employee found {0}", empleado.getLogin());
 				// compare passwords
-				if (!password.equals(empleado.getPassword())) {
+				if (password.equals(empleado.getPassword())) {
+					// Update last access 
+					empleado.setLastAccess(new Date());
+					entityManager.merge(empleado);
+					entityManager.flush();
+					LOGGER.log(Level.INFO, "EmpleadoManagerEJB: Employee last access update.");
+				} else {
 					LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception wrong password.");
 					throw new ReadException("Wrong password");
 				}
+
 			}
 		} catch (Exception ex) {
 			LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception Finding employee by login:", ex.getMessage());

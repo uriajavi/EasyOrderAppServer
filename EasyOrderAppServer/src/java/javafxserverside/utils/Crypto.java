@@ -31,7 +31,7 @@ public class Crypto {
 	private static final Logger LOGGER = Logger.getLogger("easyorderappserver");
 
 	public static byte[] decryptPassword(String password) {
-		LOGGER.log(Level.INFO, "EmpleadoRESTful service: decrypting password.");
+		LOGGER.log(Level.INFO, "Crypto: decrypting password.");
 		byte[] decryptedPassword = null;
 		byte[] passwordByteArray = DatatypeConverter.parseHexBinary(password);
 
@@ -64,7 +64,7 @@ public class Crypto {
 			decryptedPassword = cipher.doFinal(passwordByteArray);
 
 		} catch (IOException | InvalidKeySpecException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
-			LOGGER.log(Level.SEVERE, "EmpleadoRESTful service: Exception decrypting password, {0}", ex.getMessage());
+			LOGGER.log(Level.SEVERE, "Crypto: Exception decrypting password, {0}", ex.getMessage());
 		} finally {
 			try {
 				if (fileInputStream != null) {
@@ -75,12 +75,12 @@ public class Crypto {
 			}
 		}
 
-		LOGGER.log(Level.INFO, "EmpleadoRESTful service: password decrypted.");
+		LOGGER.log(Level.INFO, "Crypto: password decrypted.");
 		return decryptedPassword;
 	}
 
 	public static String digestPassword(byte[] password) {
-		LOGGER.log(Level.INFO, "EmpleadoRESTful service: Digesting password.");
+		LOGGER.log(Level.INFO, "Crypto: Digesting password.");
 		String digestedPassword = null;
 
 		try {
@@ -89,9 +89,9 @@ public class Crypto {
 			digestedPassword = DatatypeConverter.printHexBinary(messageDigest.digest());
 
 		} catch (NoSuchAlgorithmException ex) {
-			LOGGER.log(Level.SEVERE, "EmpleadoRESTful service: Exception digesting password, {0}", ex.getMessage());
+			LOGGER.log(Level.SEVERE, "Crypto: Exception digesting password, {0}", ex.getMessage());
 		}
-		LOGGER.log(Level.INFO, "EmpleadoRESTful service: password digested.");
+		LOGGER.log(Level.INFO, "Crypto: password digested.");
 
 		return digestedPassword;
 	}
