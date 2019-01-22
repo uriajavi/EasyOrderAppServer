@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package javafxserverside.entity;
 
 import java.io.Serializable;
@@ -17,13 +22,15 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+
 /**
  * Entity JPA class for the client data.
  *
- * @author Imanol
+ * @author Igor
  */
 @Entity
 @Table(name = "cliente", schema = "easyorderappdb")
+
 public class Cliente implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -80,19 +87,19 @@ public class Cliente implements Serializable {
 	 * Residence of the client.
 	 */
 	@ManyToOne
-	@JoinColumn(name = "id")
 	private Domicilio domicilio;
 	/**
 	 * Account of the client.
 	 */
 	@OneToOne
-	@MapsId
-	@JoinColumn(name = "id")
+	//@MapsId
+        @JoinColumn(name = "cuenta_id") 
 	private Cuenta cuenta;
+        
 	/**
 	 * Shifts of the client.
 	 */
-	@OneToMany(mappedBy = "pedido")
+	@OneToMany(mappedBy = "cliente")
 	private List<Pedido> pedidos;
 
 	/**
@@ -375,5 +382,19 @@ public class Cliente implements Serializable {
 	public String toString() {
 		return "Cliente{" + "id=" + id + ", login=" + login + '}';
 	}
+
+    /**
+     * @return the pedidos
+     */
+    public List<Pedido> getPedidos() {
+        return pedidos;
+    }
+
+    /**
+     * @param pedidos the pedidos to set
+     */
+    public void setPedidos(List<Pedido> pedidos) {
+        this.pedidos = pedidos;
+    }
 
 }

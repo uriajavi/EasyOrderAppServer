@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package javafxserverside.entity;
 
 import java.io.Serializable;
@@ -12,14 +17,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Entity JPA class for employee data.
  *
- * @author Imanol
+ * @author Igor
  */
 @Entity
 @Table(name = "empleado", schema = "easyorderappdb")
+@XmlRootElement
 public class Empleado implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -75,7 +82,7 @@ public class Empleado implements Serializable {
 	/**
 	 * Shifts of the employee.
 	 */
-	@ManyToMany(mappedBy = "pedido")
+	@ManyToMany(mappedBy = "empleados")
 	private List<Pedido> pedidos;
 
 	/**
@@ -276,6 +283,20 @@ public class Empleado implements Serializable {
 		return telefono;
 	}
 
+        
+    /**
+     * @return the pedidos
+     */
+    public List<Pedido> getPedidos() {
+        return pedidos;
+    }
+
+    /**
+     * @param pedidos the pedidos to set
+     */
+    public void setPedidos(List<Pedido> pedidos) {
+        this.pedidos = pedidos;
+    }
 	/**
 	 * HashCode method implementation for the entity.
 	 *
@@ -323,5 +344,7 @@ public class Empleado implements Serializable {
 	public String toString() {
 		return "Empleado{" + "id=" + id + ", login=" + login + '}';
 	}
+
+    
 
 }
