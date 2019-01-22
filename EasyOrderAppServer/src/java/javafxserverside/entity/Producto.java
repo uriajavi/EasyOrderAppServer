@@ -10,6 +10,11 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 
 
@@ -19,11 +24,18 @@ import javax.persistence.ManyToMany;
  * @author Igor
  */
 @Entity
+@Table(name="producto", schema="easyorderappdb")
+@NamedQueries({
+    @NamedQuery(name="findAllProducts",
+            query="SELECT u FROM Producto u ORDER BY u.nombre ASC"
+    )
+})
+@XmlRootElement
 public class Producto implements Serializable {
     /**
      * List of {@link Producto} belonging to the department.
      */
-    @ManyToMany(mappedBy = "pedido")
+    @ManyToMany(mappedBy = "productos")
     private List<Pedido> pedidos;
     private static final long serialVersionUID = 1L;
     /**
@@ -114,6 +126,7 @@ public class Producto implements Serializable {
      * Gets the list of pedidos .
      * @return A List of {@link Pedido}.
      */
+    @XmlTransient
     public List<Pedido> getPedidos() {
         return pedidos;
     }
