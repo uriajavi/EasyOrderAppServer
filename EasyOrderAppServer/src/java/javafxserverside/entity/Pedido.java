@@ -7,11 +7,13 @@ package javafxserverside.entity;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Date;
 
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,6 +23,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -34,11 +37,13 @@ import javax.xml.bind.annotation.XmlTransient;
  */
 @Entity
 @Table(name = "pedido", schema = "easyorderappdb")
-@XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "buscarTodosLosPedidos", query = "SELECT p FROM Pedido p ORDER BY p.nombre DESC"
-    )
+    ),
+     @NamedQuery(name = "buscarPedidoDeCliente", query = "SELECT p FROM Pedido p WHERE p.cliente =:cliente"
+    )       
 })
+@XmlRootElement
 public class Pedido implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -47,31 +52,34 @@ public class Pedido implements Serializable {
     private Integer id;
 
     private String nombre;
-    
+
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private java.util.Date fechaTramitado;
-   @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private java.util.Date fechaPreparado;
-   @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private java.util.Date fechaEntregado;
-    
+
     @ManyToOne
     private Cliente cliente;
-    
+
     @Enumerated(EnumType.ORDINAL)
     private EstadoPedido estadoPedido;
-    
-    @ManyToMany
-    
+
+    @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(name = "PEDIDO_EMPLEADO", schema = "easyorderappdb")
     private List<Empleado> empleados;
-    
-    @ManyToMany
-    @JoinTable(name = "PEDIDO_PRODUCTO", schema = "easyorderappdb")
-    private List<Producto> productos;
 
+    @OneToMany(mappedBy = "pedido", fetch=FetchType.EAGER)
+    private List<ProductoPedido> productos;
     
     
+    //Cambios de ultimo momento
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    private java.util.Date fechaPedido;
+    
+    private String horaPedido;
+   
     //Getters and setters
     public void setNombre(String nombre) {
         this.nombre = nombre;
@@ -128,6 +136,43 @@ public class Pedido implements Serializable {
     public void setId(Integer id) {
         this.id = id;
     }
+       @XmlTransient
+    public List<Empleado> getEmpleados() {
+        return empleados;
+    }
+
+    public void setEmpleados(List<Empleado> empleados) {
+        this.empleados = empleados;
+    }
+
+    public List<ProductoPedido> getProductos() {
+        return productos;
+    }
+
+    public void setProductos(List<ProductoPedido> productos) {
+        this.productos = productos;
+    }
+
+    public Date getFechaPedido() {
+        return fechaPedido;
+    }
+
+    public String getHora() {
+        return horaPedido;
+    }
+
+    public void setFechaPedido(Date fechaPedido) {
+        this.fechaPedido = fechaPedido;
+    }
+
+    public void setHora(String horaPedido) {
+        this.horaPedido = horaPedido;
+    }
+    
+    
+    
+    
+    
 
     //Metodoak
     @Override
