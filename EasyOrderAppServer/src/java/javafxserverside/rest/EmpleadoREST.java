@@ -81,6 +81,41 @@ public class EmpleadoREST {
 		return empleado;
 	}
 
+	@GET
+	@Path("login/{login}/{actualPassword}/{nuevaPassword}")
+	@Produces({"application/xml"})
+	public Empleado cambiarContrasegna(@PathParam("login") String login, @PathParam("actualPassword") String actualPassword, @PathParam("nuevaPassword") String nuevaPassword) {
+		Empleado empleado = null;
+		try {
+			LOGGER.log(Level.INFO, "EmpleadoRESTful service: change password employee by login={0}", login);
+			empleado = ejb.cambiarContrasegna(login, actualPassword, nuevaPassword);
+			LOGGER.log(Level.INFO, "EmpleadoRESTful service: changed password employee by login={0}", login);
+		} catch (ReadException ex) {
+			LOGGER.log(Level.SEVERE, "EmpleadoRESTful service: Exception changing password, {0}", ex.getMessage());
+			throw new InternalServerErrorException(ex);
+		}
+		return empleado;
+	}
+
+	@GET
+	@Path("login/{login}")
+	@Produces({"application/xml"})
+	public boolean recuperarContrasegna(@PathParam("login") String login){
+		boolean isPasswordRestored = false;
+		try{
+			LOGGER.log(Level.INFO, "EmpleadoRESTful service: restoring password...");
+
+			isPasswordRestored = ejb.recuperarContrasegna(login);
+			LOGGER.log(Level.INFO, "EmpleadoRESTful service: restored password.");
+		
+		} catch (ReadException ex) {
+			LOGGER.log(Level.SEVERE, "EmpleadoRESTful service: Exception restoring password, {0}", ex.getMessage());
+			throw new InternalServerErrorException(ex);
+		}
+		return isPasswordRestored;
+	}
+	
+
 	/**
 	 * RESTful GET method for reading all {@link Empleado} objects through an
 	 * XML representation.
@@ -103,7 +138,6 @@ public class EmpleadoREST {
 
 		return empleados;
 	}
-
 
 	/**
 	 * RESTful POST method for creating {@link Empleado} objects from XML

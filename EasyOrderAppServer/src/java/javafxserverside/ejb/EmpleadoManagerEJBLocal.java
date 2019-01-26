@@ -24,7 +24,12 @@ public interface EmpleadoManagerEJBLocal {
 	 * @throws ReadException If there is any Exception during processing.
 	 */
 	public Empleado findEmpleadoById(Integer id) throws ReadException;
+
 	public Empleado iniciarSesion(String login, String password) throws ReadException;
+
+	public Empleado cambiarContrasegna(String login, String actualPassword, String nuevaPassword) throws ReadException;
+
+	public boolean recuperarContrasegna(String login) throws ReadException;
 
 	/**
 	 * Finds a List of {@link Empleado} objects containing data for all

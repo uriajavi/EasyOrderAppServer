@@ -2,6 +2,7 @@ package javafxserverside.ejb;
 
 import java.util.Date;
 import java.util.List;
+import java.util.ResourceBundle;
 import javafxserverside.entity.Empleado;
 import javafxserverside.exception.CreateException;
 import javafxserverside.exception.DeleteException;
@@ -9,11 +10,17 @@ import javafxserverside.exception.ReadException;
 import javafxserverside.exception.UpdateException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafxserverside.utils.Crypto;
 import static javafxserverside.utils.Crypto.decryptPassword;
 import static javafxserverside.utils.Crypto.digestPassword;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.xml.bind.DatatypeConverter;
+import org.apache.commons.mail.DefaultAuthenticator;
+import org.apache.commons.mail.Email;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.SimpleEmail;
 
 /**
  * EJB class for managing employee entity CRUD operations.
@@ -81,11 +88,111 @@ public class EmpleadoManagerEJB implements EmpleadoManagerEJBLocal {
 
 			}
 		} catch (Exception ex) {
-			LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception Finding employee by login:", ex.getMessage());
+			LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception Finding employee by login, {0}.", ex.getMessage());
 			throw new ReadException(ex.getMessage());
 		}
 
 		return empleado;
+	}
+
+	private void sendEmail(String sender, String password, String receiver, String subject, String message) {
+		LOGGER.info("EmpleadoManagerEJB: Sending email...");
+
+		try {
+			Email email = new SimpleEmail();
+			email.setHostName("smtp.googlemail.com");
+			email.setSmtpPort(587);
+			email.setSslSmtpPort("587");
+			email.setAuthenticator(new DefaultAuthenticator(sender, password));
+			email.setSSLOnConnect(true);
+			email.setFrom(sender);
+			email.setSubject(subject);
+			email.setMsg(message);
+			email.addTo(receiver);
+			email.setStartTLSEnabled(true);
+			email.send();
+		} catch (EmailException ex) {
+			LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception sending email, {0}.", ex.getMessage());
+		}
+
+		LOGGER.info("EmpleadoManagerEJB: Sent email.");
+	}
+
+	@Override
+	public Empleado cambiarContrasegna(String login, String actualPassword, String nuevaPassword) throws ReadException{
+		Empleado empleado = null;
+
+		try {
+			LOGGER.info("EmpleadoManagerEJB: Changing password.");
+			actualPassword = Crypto.digestPassword(Crypto.decryptPassword(actualPassword));
+			nuevaPassword = Crypto.digestPassword(Crypto.decryptPassword(nuevaPassword));
+
+			empleado = (Empleado) entityManager.createNamedQuery("findEmployeeByLogin").setParameter("login", login).getSingleResult();
+			if (empleado != null) {
+				if (actualPassword.equals(empleado.getPassword())) {
+					empleado.setPassword(nuevaPassword);
+					empleado.setLastPasswordChange(new Date());
+					entityManager.merge(empleado);
+					entityManager.flush();
+					// Send email
+					String emailAccount = ResourceBundle.getBundle("javafxserverside.config.parameters").getString("email.account");
+					emailAccount = Crypto.decryptSecretKey(emailAccount);
+					String emailPassword = ResourceBundle.getBundle("javafxserverside.config.parameters").getString("email.password");
+					emailPassword = Crypto.decryptSecretKey(emailPassword);
+					String subject = "EasyOrderApp Password Change";
+					String message = "Your password has been changed.";
+					sendEmail(emailAccount, emailPassword, empleado.getEmail(), subject, message);
+					LOGGER.info("EmpleadoManagerEJB: Changed password.");
+				} else {
+					LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception wrong password");
+					throw new UpdateException("Wrong password");
+				}
+			}
+		} catch (Exception ex) {
+			LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception changing password, {0}.", ex.getMessage());
+			throw new ReadException(ex.getMessage());
+		}
+
+		return empleado;
+	}
+
+	@Override
+	public boolean recuperarContrasegna(String login) throws ReadException {
+		LOGGER.info("EmpleadoManagerEJB: Restoring password...");
+		boolean isPasswordRestored = false;
+		try {
+
+			Empleado empleado = (Empleado) entityManager.createNamedQuery("findEmployeeByLogin").setParameter("login", login).getSingleResult();
+			if (empleado != null) {
+				// Generate random emailPassword
+				String nuevaPassword = Crypto.generateSecurePassword();
+
+				// Diggest emailPassword
+				//byte[] a = DatatypeConverter.parseHexBinary(nuevaPassword);
+				String nuevaPasswordDiggest = Crypto.digestPassword(nuevaPassword.getBytes());
+
+				// Save emailPassword
+				empleado.setPassword(nuevaPasswordDiggest);
+				empleado.setLastPasswordChange(new Date());
+				entityManager.merge(empleado);
+				entityManager.flush();
+				isPasswordRestored = true;
+
+				// Get emailAccount and send new emailPassword
+				String emailAccount = ResourceBundle.getBundle("javafxserverside.config.parameters").getString("email.account");
+				emailAccount = Crypto.decryptSecretKey(emailAccount);
+				String emailPassword = ResourceBundle.getBundle("javafxserverside.config.parameters").getString("email.password");
+				emailPassword = Crypto.decryptSecretKey(emailPassword);
+				String subject = "EasyOrderApp Password Restored";
+				String message = "Your password has been restored to: " + nuevaPassword;
+				sendEmail(emailAccount, emailPassword, empleado.getEmail(), subject, message);
+			}
+		} catch (Exception ex) {
+			LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception restoring password, {0}.", ex.getMessage());
+			throw new ReadException(ex.getMessage());
+		}
+		LOGGER.info("EmpleadoManagerEJB: Restored password.");
+		return isPasswordRestored;
 	}
 
 	/**
