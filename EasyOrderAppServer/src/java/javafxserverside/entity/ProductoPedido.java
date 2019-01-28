@@ -6,9 +6,10 @@
 package javafxserverside.entity;
 
 import java.io.Serializable;
+import javax.persistence.CascadeType;
+import static javax.persistence.CascadeType.MERGE;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -28,10 +29,10 @@ public class ProductoPedido implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @ManyToOne   
+    @ManyToOne
     private Pedido pedido;
     @Id
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.EAGER)   
     private Producto producto;
     private Integer cantidad;
     
@@ -43,7 +44,7 @@ public class ProductoPedido implements Serializable {
     /**
      * @return the pedido
      */
-    @XmlTransient
+   @XmlTransient
     public Pedido getPedido() {
         return pedido;
     }
@@ -84,8 +85,12 @@ public class ProductoPedido implements Serializable {
     }
     
     
-    
-    
+    //METODOAK
+     /**
+     * HashCode method implementation for the entity.
+     *
+     * @return An integer value as hashcode for the object.
+     */
 
     @Override
     public int hashCode() {
@@ -94,6 +99,13 @@ public class ProductoPedido implements Serializable {
         return hash;
     }
 
+     /**
+     * This method compares two productopedido entities for equality. This
+     * implementation compare login field value for equality.
+     *
+     * @param object The object to compare to.
+     * @return True if objects are equals, otherwise false.
+     */
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
@@ -107,10 +119,20 @@ public class ProductoPedido implements Serializable {
         }
         return true;
     }
-
+    
+      /**
+     * This method returns a String representation for a productopedido entity instance.
+     *
+     * @return The String representation for the productopedido object.
+     */
+    //Para que imprima el error 
     @Override
     public String toString() {
-        return "javafxserverside.entity.ProductoPedido[ pedido=" + getPedido().getId() + " producto=" + getProducto().getId()+"]";
+        String retorno = "javafxserverside.entity.ProductoPedido[ pedido=";
+        if(getPedido() != null) retorno= retorno + getPedido().getId(); 
+        if(getProducto() != null) retorno = retorno + " producto=" + getProducto().getId();
+        
+        return retorno;
     }
 
     
