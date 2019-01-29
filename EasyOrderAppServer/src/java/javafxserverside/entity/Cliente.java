@@ -1,7 +1,7 @@
 package javafxserverside.entity;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.Entity;
@@ -11,10 +11,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -24,6 +26,10 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "cliente", schema = "easyorderappdb")
+@NamedQueries({
+	@NamedQuery(name = "findAllClients",
+		query = "SELECT c FROM Cliente c ORDER BY c.login DESC")
+})
 @XmlRootElement
 public class Cliente implements Serializable {
 
@@ -64,15 +70,18 @@ public class Cliente implements Serializable {
 	/**
 	 * Last time the employee signed in.
 	 */
-	private Timestamp lastAccess;
+	@Temporal(javax.persistence.TemporalType.TIMESTAMP)
+	private Date lastAccess;
 	/**
 	 * Last time the employee changed password.
 	 */
-	private Timestamp lastPasswordChange;
+	@Temporal(javax.persistence.TemporalType.TIMESTAMP)
+	private Date lastPasswordChange;
 	/**
 	 * Birth date of the employee.
 	 */
-	private Timestamp fechaDeNacimiento;
+	@Temporal(javax.persistence.TemporalType.TIMESTAMP)
+	private Date fechaDeNacimiento;
 	/**
 	 * Phone number of the employee.
 	 */
@@ -80,14 +89,15 @@ public class Cliente implements Serializable {
 	/**
 	 * Residence of the client.
 	 */
-	@ManyToOne
-	private Domicilio domicilio;
+	private String localidad;
+	private String codigoPostal;
+	private String direccion;
 	/**
 	 * Account of the client.
 	 */
-	@OneToOne
-	@MapsId
-	private Cuenta cuenta;
+	private String numeroCuenta;
+	private String codigoSeguridad;
+	private Double saldo;
 	/**
 	 * Shifts of the client.
 	 */
@@ -225,7 +235,7 @@ public class Cliente implements Serializable {
 	 *
 	 * @return The last access value.
 	 */
-	public Timestamp getLastAccess() {
+	public Date getLastAccess() {
 		return lastAccess;
 	}
 
@@ -234,7 +244,7 @@ public class Cliente implements Serializable {
 	 *
 	 * @param lastAccess The last access value.
 	 */
-	public void setLastAccess(Timestamp lastAccess) {
+	public void setLastAccess(Date lastAccess) {
 		this.lastAccess = lastAccess;
 	}
 
@@ -243,7 +253,7 @@ public class Cliente implements Serializable {
 	 *
 	 * @return The last password change.
 	 */
-	public Timestamp getLastPasswordChange() {
+	public Date getLastPasswordChange() {
 		return lastPasswordChange;
 	}
 
@@ -252,7 +262,7 @@ public class Cliente implements Serializable {
 	 *
 	 * @param lastPasswordChange The last password change value.
 	 */
-	public void setLastPasswordChange(Timestamp lastPasswordChange) {
+	public void setLastPasswordChange(Date lastPasswordChange) {
 		this.lastPasswordChange = lastPasswordChange;
 	}
 
@@ -261,7 +271,7 @@ public class Cliente implements Serializable {
 	 *
 	 * @return The birth date value.
 	 */
-	public Timestamp getFechaDeNacimiento() {
+	public Date getFechaDeNacimiento() {
 		return fechaDeNacimiento;
 	}
 
@@ -270,7 +280,7 @@ public class Cliente implements Serializable {
 	 *
 	 * @param fechaDeNacimiento The birth date value.
 	 */
-	public void setFechaDeNacimiento(Timestamp fechaDeNacimiento) {
+	public void setFechaDeNacimiento(Date fechaDeNacimiento) {
 		this.fechaDeNacimiento = fechaDeNacimiento;
 	}
 
@@ -293,39 +303,111 @@ public class Cliente implements Serializable {
 	}
 
 	/**
-	 * Gets the residence value of the client.
+	 * Gets the town value of the residence.
 	 *
-	 * @return The residence value.
+	 * @return The town value.
 	 */
-	public Domicilio getDomicilio() {
-		return domicilio;
+	public String getLocalidad() {
+		return localidad;
 	}
 
 	/**
-	 * Sets the residence value of the client.
+	 * Sets the town value of the residence.
 	 *
-	 * @param domicilio The residence value.
+	 * @param localidad The town value.
 	 */
-	public void setDomicilio(Domicilio domicilio) {
-		this.domicilio = domicilio;
+	public void setLocalidad(String localidad) {
+		this.localidad = localidad;
 	}
 
 	/**
-	 * Gets the account value of the client.
+	 * Gets the CP value of the residence.
 	 *
-	 * @return The account value.
+	 * @return The CP value.
 	 */
-	public Cuenta getCuenta() {
-		return cuenta;
+	public String getCodigoPostal() {
+		return codigoPostal;
 	}
 
 	/**
-	 * Sets the account value of the client.
+	 * Sets the CP value of the residence.
 	 *
-	 * @param cuenta The account value.
+	 * @param codigoPostal The CP value.
 	 */
-	public void setCuenta(Cuenta cuenta) {
-		this.cuenta = cuenta;
+	public void setCodigoPostal(String codigoPostal) {
+		this.codigoPostal = codigoPostal;
+	}
+
+	/**
+	 * Gets the address value of the residence.
+	 *
+	 * @return The address value.
+	 */
+	public String getDireccion() {
+		return direccion;
+	}
+
+	/**
+	 * Sets the address value of the residence.
+	 *
+	 * @param direccion The address value.
+	 */
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
+	}
+
+	/**
+	 * Gets the account number of the account.
+	 *
+	 * @return The account number.
+	 */
+	public String getNumeroCuenta() {
+		return numeroCuenta;
+	}
+
+	/**
+	 * Sets the account number of the account.
+	 *
+	 * @param numeroCuenta The account number value.
+	 */
+	public void setNumeroCuenta(String numeroCuenta) {
+		this.numeroCuenta = numeroCuenta;
+	}
+
+	/**
+	 * Gets the security code of the account.
+	 *
+	 * @return The security code value.
+	 */
+	public String getCodigoSeguridad() {
+		return codigoSeguridad;
+	}
+
+	/**
+	 * Sets the security code of the account.
+	 *
+	 * @param codigoSeguridad The security code value.
+	 */
+	public void setCodigoSeguridad(String codigoSeguridad) {
+		this.codigoSeguridad = codigoSeguridad;
+	}
+
+	/**
+	 * Gets the balance of the account.
+	 *
+	 * @return The balance value.
+	 */
+	public Double getSaldo() {
+		return saldo;
+	}
+
+	/**
+	 * Sets the balance of the account.
+	 *
+	 * @param saldo The balance value.
+	 */
+	public void setSaldo(Double saldo) {
+		this.saldo = saldo;
 	}
 
 	/**

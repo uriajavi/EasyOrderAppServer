@@ -21,6 +21,7 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+
 /**
  *
  * @author Igor
@@ -111,5 +112,4 @@ public class Producto implements Serializable {
     public String toString() {
         return "javafxserverside.entity.Producto[ id=" + id + " ]";
     }
-
 }

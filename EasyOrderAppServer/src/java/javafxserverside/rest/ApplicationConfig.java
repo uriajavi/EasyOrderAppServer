@@ -10,26 +10,29 @@ import javax.ws.rs.core.Application;
 
 /**
  * This is the User management RESTful web service application class.
- * @author javi
+ *
+ * @author Team
  */
 @javax.ws.rs.ApplicationPath("webresources")
 public class ApplicationConfig extends Application {
-    /**
-     * Gets classes for web service application resources.  
-     * @return A Set containing Class objects for resources.
-     */
-    @Override
-    public Set<Class<?>> getClasses() {
-        Set<Class<?>> resources = new java.util.HashSet<>();
-        addRestResourceClasses(resources);
-        return resources;
-    }
-    /**
-     * Adds needed resource's classes to a Set of resources.
-     * @param resources The resource's classes Set.
-     */
-    private void addRestResourceClasses(Set<Class<?>> resources) {
-        resources.add(javafxserverside.rest.PedidoFacadeREST.class);
-    }
-    
+
+	@Override
+	public Set<Class<?>> getClasses() {
+		Set<Class<?>> resources = new java.util.HashSet<>();
+		addRestResourceClasses(resources);
+		return resources;
+	}
+
+	/**
+	 * Do not modify addRestResourceClasses() method.
+	 * It is automatically populated with
+	 * all resources defined in the project.
+	 * If required, comment out calling this method in getClasses().
+	 */
+	private void addRestResourceClasses(Set<Class<?>> resources) {
+		resources.add(javafxserverside.rest.ClienteREST.class);
+		resources.add(javafxserverside.rest.EmpleadoREST.class);
+    resources.add(javafxserverside.rest.PedidoFacadeREST.class);
+	}
+	
 }

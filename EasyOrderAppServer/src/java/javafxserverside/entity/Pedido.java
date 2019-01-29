@@ -142,7 +142,6 @@ public class Pedido implements Serializable {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
-
     /**
      * Gets fechaTramitado value for pedido
      *
