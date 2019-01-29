@@ -8,10 +8,12 @@ package javafxserverside.entity;
 import java.io.Serializable;
 import javax.persistence.CascadeType;
 import static javax.persistence.CascadeType.MERGE;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -28,10 +30,12 @@ import javax.xml.bind.annotation.XmlTransient;
 public class ProductoPedido implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @Id
+    @EmbeddedId
+    private ProductoPedidoId id;
+    @MapsId("pedidoId")
     @ManyToOne
     private Pedido pedido;
-    @Id
+    @MapsId("productoId")
     @ManyToOne(fetch=FetchType.EAGER)   
     private Producto producto;
     private Integer cantidad;
