@@ -25,10 +25,34 @@ public interface EmpleadoManagerEJBLocal {
 	 */
 	public Empleado findEmpleadoById(Integer id) throws ReadException;
 
+	/**
+	 * Signs in a {@link Empleado} by its login and password.
+	 *
+	 * @param login The login for the employee to be found.
+	 * @param password The password for the employee to be found.
+	 * @return The {@link Empleado} object containing employee data.
+	 * @throws ReadException If there is any Exception during processing.
+	 */
 	public Empleado iniciarSesion(String login, String password) throws ReadException;
 
+	/**
+	 * Change the password of an {@link Empleado}.
+	 *
+	 * @param login The login for the employee to be found.
+	 * @param actualPassword The current password of the employee.
+	 * @param nuevaPassword The new password of the employee.
+	 * @return The {@link Empleado} object containing employee data.
+	 * @throws ReadException If there is any Exception during processing.
+	 */
 	public Empleado cambiarContrasegna(String login, String actualPassword, String nuevaPassword) throws ReadException;
 
+	/**
+	 * Restores the password of an {@link Empleado}.
+	 *
+	 * @param login The login of the employee to be found.
+	 * @return True if restored correctly, false otherwise.
+	 * @throws ReadException If there is any Exception during processing.
+	 */
 	public boolean recuperarContrasegna(String login) throws ReadException;
 
 	/**

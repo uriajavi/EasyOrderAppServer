@@ -29,15 +29,25 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 
 /**
+ * Custom class for cryptography and security purposes.
  *
  * @author Imanol
  */
 public class Crypto {
 
+	/**
+	 * Logger for the class.
+	 */
 	private static final Logger LOGGER = Logger.getLogger("easyorderappserver");
 
+	/**
+	 * Decrypts input password using private key.
+	 *
+	 * @param password The password to decrypt.
+	 * @return The decrypted password.
+	 */
 	public static byte[] decryptPassword(String password) {
-		LOGGER.log(Level.INFO, "Crypto: decrypting password.");
+		LOGGER.log(Level.INFO, "Crypto: decrypting password...");
 		byte[] decryptedPassword = null;
 		byte[] passwordByteArray = DatatypeConverter.parseHexBinary(password);
 
@@ -77,7 +87,7 @@ public class Crypto {
 					fileInputStream.close();
 				}
 			} catch (IOException ex) {
-				// Error closing input stream file
+				LOGGER.log(Level.SEVERE, "Crypto: Exception closing input stream file, {0}.", ex.getMessage());
 			}
 		}
 
@@ -85,8 +95,14 @@ public class Crypto {
 		return decryptedPassword;
 	}
 
+	/**
+	 * Hashes/Digests the input password using a SHA-512 algorithm.
+	 *
+	 * @param password The password to digest.
+	 * @return The digested password.
+	 */
 	public static String digestPassword(byte[] password) {
-		LOGGER.log(Level.INFO, "Crypto: Digesting password.");
+		LOGGER.log(Level.INFO, "Crypto: Digesting password...");
 		String digestedPassword = null;
 
 		try {
@@ -97,11 +113,17 @@ public class Crypto {
 		} catch (NoSuchAlgorithmException ex) {
 			LOGGER.log(Level.SEVERE, "Crypto: Exception digesting password, {0}", ex.getMessage());
 		}
-		LOGGER.log(Level.INFO, "Crypto: password digested.");
 
+		LOGGER.log(Level.INFO, "Crypto: password digested.");
 		return digestedPassword;
 	}
 
+	/**
+	 * Decrypts the content of the file with the input path using a secret key.
+	 *
+	 * @param path The path of the file.
+	 * @return The decrypted content of the file.
+	 */
 	public static String decryptSecretKey(String path) {
 		LOGGER.info("Crypto: Decrypting with secret key...");
 		String decryptedText = null;
@@ -112,16 +134,16 @@ public class Crypto {
 		byte[] salt = "Hello world!!!!!".getBytes();
 		KeySpec spec = new PBEKeySpec(secretkey.toCharArray(), salt, iterationCount, 128);
 
-		ObjectInputStream objectOutputStream = null;
+		ObjectInputStream objectInputStream = null;
 		try {
-			objectOutputStream = new ObjectInputStream(new FileInputStream(path));
+			objectInputStream = new ObjectInputStream(new FileInputStream(path));
 
 			SecretKeyFactory factory = SecretKeyFactory.getInstance(sfkAlgorithm);
 			byte[] key = factory.generateSecret(spec).getEncoded();
 			SecretKey privateKey = new SecretKeySpec(key, 0, key.length, "AES");
 
-			byte[] iv = (byte[]) objectOutputStream.readObject();
-			byte[] encodedMessage = (byte[]) objectOutputStream.readObject();
+			byte[] iv = (byte[]) objectInputStream.readObject();
+			byte[] encodedMessage = (byte[]) objectInputStream.readObject();
 
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
 			IvParameterSpec ivParam = new IvParameterSpec(iv);
@@ -131,13 +153,28 @@ public class Crypto {
 
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException | ClassNotFoundException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
 			Logger.getLogger(Crypto.class.getName()).log(Level.SEVERE, null, ex);
+			LOGGER.log(Level.SEVERE, "Crypto: Exception decrypting file content, {0}", ex.getMessage());
+		} finally {
+			try {
+				if (objectInputStream != null) {
+					objectInputStream.close();
+				}
+			} catch (IOException ex) {
+				LOGGER.log(Level.SEVERE, "Crypto: Exception closing input object object, {0}", ex.getMessage());
+			}
 		}
+
 		LOGGER.info("Crypto: Decrypted with secret key.");
 		return decryptedText;
 	}
 
+	/**
+	 * Generated a random secure password.
+	 *
+	 * @return The password.
+	 */
 	public static String generateSecurePassword() {
-		LOGGER.info("EmpleadoManagerEJB: Generating secure password...");
+		LOGGER.info("Crypto: Generating secure password...");
 		String securePassword = null;
 		String[] symbols = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
 
@@ -152,11 +189,10 @@ public class Crypto {
 			}
 			securePassword = stringBuilder.toString();
 		} catch (NoSuchAlgorithmException ex) {
-			LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception generating secure password, {0}.", ex.getMessage());
-			// TODO
+			LOGGER.log(Level.SEVERE, "Crypto: Exceptiong generating secure password, {0}.", ex.getMessage());
 		}
 
-		LOGGER.info("EmpleadoManagerEJB: Generated secure password.");
+		LOGGER.info("Crypto: Generated secure password.");
 		return securePassword;
 	}
 }

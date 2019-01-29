@@ -13,14 +13,10 @@ import java.util.logging.Logger;
 import javafxserverside.utils.Crypto;
 import static javafxserverside.utils.Crypto.decryptPassword;
 import static javafxserverside.utils.Crypto.digestPassword;
+import javafxserverside.utils.MyEmail;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.xml.bind.DatatypeConverter;
-import org.apache.commons.mail.DefaultAuthenticator;
-import org.apache.commons.mail.Email;
-import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.SimpleEmail;
 
 /**
  * EJB class for managing employee entity CRUD operations.
@@ -49,43 +45,52 @@ public class EmpleadoManagerEJB implements EmpleadoManagerEJBLocal {
 	 */
 	@Override
 	public Empleado findEmpleadoById(Integer id) throws ReadException {
+		LOGGER.info("EmpleadoManagerEJB: Finding employee by id.");
 		Empleado empleado = null;
 
 		try {
-			LOGGER.info("EmpleadoManagerEJB: Finding employee by id.");
 			empleado = entityManager.find(Empleado.class, id);
-			LOGGER.log(Level.INFO, "EmpleadoManagerEJB: Employee found {0}", empleado.getId());
 		} catch (Exception ex) {
 			LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception Finding employee by id:", ex.getMessage());
 			throw new ReadException(ex.getMessage());
 		}
 
+		LOGGER.log(Level.INFO, "EmpleadoManagerEJB: Employee found {0}", empleado.getId());
 		return empleado;
 	}
 
+	/**
+	 * Signs in a {@link Empleado} by its login and password.
+	 *
+	 * @param login The login for the employee to be found.
+	 * @param password The password for the employee to be found.
+	 * @return The {@link Empleado} object containing employee data.
+	 * @throws ReadException If there is any Exception during processing.
+	 */
 	@Override
 	public Empleado iniciarSesion(String login, String password) throws ReadException {
+		LOGGER.info("EmpleadoManagerEJB: Finding employee by login.");
 		Empleado empleado = null;
 
 		try {
-			LOGGER.info("EmpleadoManagerEJB: Finding employee by login.");
 			password = digestPassword(decryptPassword(password));
 
 			empleado = (Empleado) entityManager.createNamedQuery("findEmployeeByLogin").setParameter("login", login).getSingleResult();
 			if (empleado != null) {
 				LOGGER.log(Level.INFO, "EmpleadoManagerEJB: Employee found {0}", empleado.getLogin());
-				// compare passwords
+
 				if (password.equals(empleado.getPassword())) {
-					// Update last access 
+					LOGGER.log(Level.INFO, "EmpleadoManagerEJB: Employee last access updating...");
+
 					empleado.setLastAccess(new Date());
 					entityManager.merge(empleado);
 					entityManager.flush();
-					LOGGER.log(Level.INFO, "EmpleadoManagerEJB: Employee last access update.");
+
+					LOGGER.log(Level.INFO, "EmpleadoManagerEJB: Employee last access updated.");
 				} else {
 					LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception wrong password.");
 					throw new ReadException("Wrong password");
 				}
-
 			}
 		} catch (Exception ex) {
 			LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception Finding employee by login, {0}.", ex.getMessage());
@@ -95,45 +100,35 @@ public class EmpleadoManagerEJB implements EmpleadoManagerEJBLocal {
 		return empleado;
 	}
 
-	private void sendEmail(String sender, String password, String receiver, String subject, String message) {
-		LOGGER.info("EmpleadoManagerEJB: Sending email...");
 
-		try {
-			Email email = new SimpleEmail();
-			email.setHostName("smtp.googlemail.com");
-			email.setSmtpPort(587);
-			email.setSslSmtpPort("587");
-			email.setAuthenticator(new DefaultAuthenticator(sender, password));
-			email.setSSLOnConnect(true);
-			email.setFrom(sender);
-			email.setSubject(subject);
-			email.setMsg(message);
-			email.addTo(receiver);
-			email.setStartTLSEnabled(true);
-			email.send();
-		} catch (EmailException ex) {
-			LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception sending email, {0}.", ex.getMessage());
-		}
-
-		LOGGER.info("EmpleadoManagerEJB: Sent email.");
-	}
-
+	/**
+	 * Change the password of an {@link Empleado}.
+	 *
+	 * @param login The login for the employee to be found.
+	 * @param actualPassword The current password of the employee.
+	 * @param nuevaPassword The new password of the employee.
+	 * @return The {@link Empleado} object containing employee data.
+	 * @throws ReadException If there is any Exception during processing.
+	 */
 	@Override
-	public Empleado cambiarContrasegna(String login, String actualPassword, String nuevaPassword) throws ReadException{
+	public Empleado cambiarContrasegna(String login, String actualPassword, String nuevaPassword) throws ReadException {
+		LOGGER.info("EmpleadoManagerEJB: Changing password.");
 		Empleado empleado = null;
 
 		try {
-			LOGGER.info("EmpleadoManagerEJB: Changing password.");
 			actualPassword = Crypto.digestPassword(Crypto.decryptPassword(actualPassword));
 			nuevaPassword = Crypto.digestPassword(Crypto.decryptPassword(nuevaPassword));
 
 			empleado = (Empleado) entityManager.createNamedQuery("findEmployeeByLogin").setParameter("login", login).getSingleResult();
 			if (empleado != null) {
+				LOGGER.info("EmpleadoManagerEJB: Employee found.");
+
 				if (actualPassword.equals(empleado.getPassword())) {
 					empleado.setPassword(nuevaPassword);
 					empleado.setLastPasswordChange(new Date());
 					entityManager.merge(empleado);
 					entityManager.flush();
+
 					// Send email
 					String emailAccount = ResourceBundle.getBundle("javafxserverside.config.parameters").getString("email.account");
 					emailAccount = Crypto.decryptSecretKey(emailAccount);
@@ -141,8 +136,7 @@ public class EmpleadoManagerEJB implements EmpleadoManagerEJBLocal {
 					emailPassword = Crypto.decryptSecretKey(emailPassword);
 					String subject = "EasyOrderApp Password Change";
 					String message = "Your password has been changed.";
-					sendEmail(emailAccount, emailPassword, empleado.getEmail(), subject, message);
-					LOGGER.info("EmpleadoManagerEJB: Changed password.");
+					MyEmail.sendEmail(emailAccount, emailPassword, empleado.getEmail(), subject, message);
 				} else {
 					LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception wrong password");
 					throw new UpdateException("Wrong password");
@@ -153,9 +147,17 @@ public class EmpleadoManagerEJB implements EmpleadoManagerEJBLocal {
 			throw new ReadException(ex.getMessage());
 		}
 
+		LOGGER.info("EmpleadoManagerEJB: Changed password.");
 		return empleado;
 	}
 
+	/**
+	 * Restores the password of an {@link Empleado}.
+	 *
+	 * @param login The login of the employee to be found.
+	 * @return True if restored correctly, false otherwise.
+	 * @throws ReadException If there is any Exception during processing.
+	 */
 	@Override
 	public boolean recuperarContrasegna(String login) throws ReadException {
 		LOGGER.info("EmpleadoManagerEJB: Restoring password...");
@@ -168,7 +170,6 @@ public class EmpleadoManagerEJB implements EmpleadoManagerEJBLocal {
 				String nuevaPassword = Crypto.generateSecurePassword();
 
 				// Diggest emailPassword
-				//byte[] a = DatatypeConverter.parseHexBinary(nuevaPassword);
 				String nuevaPasswordDiggest = Crypto.digestPassword(nuevaPassword.getBytes());
 
 				// Save emailPassword
@@ -178,19 +179,20 @@ public class EmpleadoManagerEJB implements EmpleadoManagerEJBLocal {
 				entityManager.flush();
 				isPasswordRestored = true;
 
-				// Get emailAccount and send new emailPassword
+				// Send email
 				String emailAccount = ResourceBundle.getBundle("javafxserverside.config.parameters").getString("email.account");
 				emailAccount = Crypto.decryptSecretKey(emailAccount);
 				String emailPassword = ResourceBundle.getBundle("javafxserverside.config.parameters").getString("email.password");
 				emailPassword = Crypto.decryptSecretKey(emailPassword);
 				String subject = "EasyOrderApp Password Restored";
 				String message = "Your password has been restored to: " + nuevaPassword;
-				sendEmail(emailAccount, emailPassword, empleado.getEmail(), subject, message);
+				MyEmail.sendEmail(emailAccount, emailPassword, empleado.getEmail(), subject, message);
 			}
 		} catch (Exception ex) {
 			LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception restoring password, {0}.", ex.getMessage());
 			throw new ReadException(ex.getMessage());
 		}
+
 		LOGGER.info("EmpleadoManagerEJB: Restored password.");
 		return isPasswordRestored;
 	}
@@ -204,15 +206,17 @@ public class EmpleadoManagerEJB implements EmpleadoManagerEJBLocal {
 	 */
 	@Override
 	public List<Empleado> findAllEmpleados() throws ReadException {
+		LOGGER.info("EmpleadoManagerEJB: Reading all employees.");
 		List<Empleado> empleados = null;
+
 		try {
-			LOGGER.info("EmpleadoManagerEJB: Reading all employees.");
 			empleados = entityManager.createNamedQuery("findAllEmployees").getResultList();
-			LOGGER.info("EmpleadoManagerEJB: Read all employees.");
 		} catch (Exception ex) {
 			LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception reading all employees: ", ex.getMessage());
 			throw new ReadException(ex.getMessage());
 		}
+
+		LOGGER.info("EmpleadoManagerEJB: Read all employees.");
 		return empleados;
 	}
 
@@ -225,14 +229,16 @@ public class EmpleadoManagerEJB implements EmpleadoManagerEJBLocal {
 	@Override
 	public void createEmpleado(Empleado empleado) throws CreateException {
 		LOGGER.info("EmpleadoManagerEJB: Creating employee.");
+
 		try {
 			empleado.setPassword(digestPassword(decryptPassword(empleado.getPassword())));
 			entityManager.persist(empleado);
-			LOGGER.info("EmpleadoManagerEJB: Employee created.");
 		} catch (Exception ex) {
 			LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception creating employee.{0}", ex.getMessage());
 			throw new CreateException(ex.getMessage());
 		}
+
+		LOGGER.info("EmpleadoManagerEJB: Employee created.");
 	}
 
 	/**
@@ -244,14 +250,16 @@ public class EmpleadoManagerEJB implements EmpleadoManagerEJBLocal {
 	@Override
 	public void updateEmpleado(Empleado empleado) throws UpdateException {
 		LOGGER.info("EmpleadoManagerEJB: Updating employee.");
+
 		try {
 			entityManager.merge(empleado);
 			entityManager.flush();
-			LOGGER.info("EmpleadoManagerEJB: Employee updated.");
 		} catch (Exception ex) {
 			LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception updating employee.{0}", ex.getMessage());
 			throw new UpdateException(ex.getMessage());
 		}
+
+		LOGGER.info("EmpleadoManagerEJB: Employee updated.");
 	}
 
 	/**
@@ -263,14 +271,16 @@ public class EmpleadoManagerEJB implements EmpleadoManagerEJBLocal {
 	@Override
 	public void deleteEmpleado(Empleado empleado) throws DeleteException {
 		LOGGER.info("EmpleadoManagerEJB: Deleting employee.");
+
 		try {
 			empleado = entityManager.merge(empleado);
 			entityManager.remove(empleado);
-			LOGGER.info("EmpleadoManagerEJB: Employee deleted.");
 		} catch (Exception ex) {
 			LOGGER.log(Level.SEVERE, "EmpleadoManagerEJB: Exception deleting employee.{0}", ex.getMessage());
 			throw new DeleteException(ex.getMessage());
 		}
+
+		LOGGER.info("EmpleadoManagerEJB: Employee deleted.");
 	}
 
 }
