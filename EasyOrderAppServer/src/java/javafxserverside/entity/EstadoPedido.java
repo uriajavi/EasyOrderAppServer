@@ -6,9 +6,21 @@
 package javafxserverside.entity;
 
 /**
- *
- * @author Imanol
+ * This enumeration is for orders status. Includes the values TRAMITADO, PREPARADO and ENVIADO
+ * @author Leticia Garcia
  */
 public enum EstadoPedido {
-	TRAMITADO, PREPARADO, ENVIADO
+   
+    /**
+     * Cuando el pedido esta tramitado por el cliente.
+     */
+    TRAMITADO,
+    /**
+     * Cuando el pedido ha sido preparadon por el empleado.
+     */
+    PREPARADO,
+     /**
+     * Cuando el pedido ha sido enviado.
+     */
+    ENVIADO;
 }
