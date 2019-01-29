@@ -38,7 +38,7 @@ public class Producto implements Serializable {
     private Integer stock;
     private Double precioUnidad;
    
-    @OneToMany(fetch=FetchType.EAGER, mappedBy = "producto")
+    @OneToMany(mappedBy = "producto")
     private List<ProductoPedido> pedidos;
 
     //Getters and setters
@@ -78,7 +78,7 @@ public class Producto implements Serializable {
         this.id = id;
     }
 
-     @XmlTransient
+   @XmlTransient
     public List<ProductoPedido> getPedidos() {
         return pedidos;
     }
